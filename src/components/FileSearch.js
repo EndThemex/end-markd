@@ -1,41 +1,80 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faSearch, faXmark} from '@fortawesome/free-solid-svg-icons'
+import PropTypes from "prop-types";
 
 const FileSearch = ({title, onFileSearch}) => {
     const [inputActive, setInputActive] = useState(false)
     const [value, setValue] = useState('')
 
-    useEffect(() => {
-        const handleInputValue = (event) => {
-            const {keyCode} = event
-            if (keyCode === 13){
+    const node = useRef(null)
 
+    const closeSearch = (e) => {
+        e.preventDefault()
+        setInputActive(false)
+        setValue('')
+    }
+
+    useEffect(() => {
+        const handleInputEvent = (event) => {
+            const {keyCode} = event
+            if (keyCode === 13 && inputActive){
+                onFileSearch(value)
             }
+            else if (keyCode === 27 && inputActive){
+                closeSearch(event)
+            }
+        }
+        document.addEventListener('keyup', handleInputEvent)
+        return () => {
+            document.removeEventListener('keyup', handleInputEvent)
+        }
+    })
+
+    useEffect(() => {
+        if (inputActive){
+            node.current.focus()
         }
     })
 
     return (
-        <div className="alert alert-primary">
+        <div className="alert alert-primary d-flex justify-content-between align-items-center">
             {
                 !inputActive &&
-                <div className="d-flex justify-content-between align-items-center">
+                <>
                     <span>{title}</span>
-                    <button type="button" className="btn btn-primary" 
-                        onClick={() => {setInputActive(true)}}>搜索</button>
-                </div>
+                    <button type="button" className="icon-button" 
+                        onClick={() => {setInputActive(true)}}>
+                            <FontAwesomeIcon title="搜索" icon={faSearch} />
+                    </button>
+                </>
             }
             {
                 inputActive &&
-                <div className="row">
-                    <div className="col-8">
+                <>
+                    <div className="">
                         <input className="form-control" 
-                            value={value} onChange={(e) => {setValue(e.target.value)}} />
+                            value={value} 
+                            ref={node}
+                            onChange={(e) => {setValue(e.target.value)}} />
                     </div>
-                    <button type="button" className="btn btn-primary col-4" 
-                        onClick={() => {setInputActive(false)}}>关闭</button>
-                </div>
+                    <button type="button" className="icon-button" 
+                        onClick={() => {setInputActive(false)}}>
+                            <FontAwesomeIcon title="关闭" icon={faXmark} />
+                        </button>
+                </>
             }
         </div>
     )
+}
+
+FileSearch.propTypes = {
+    title: PropTypes.string,
+    onFileSearch: PropTypes.func.isRequired
+}
+
+FileSearch.defaultProps = {
+    title: "我的云文档"
 }
 
 export default FileSearch
