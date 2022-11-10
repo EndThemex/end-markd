@@ -3,29 +3,27 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faMarkdown} from '@fortawesome/free-brands-svg-icons'
 import {faEdit, faTrash, faXmark} from '@fortawesome/free-solid-svg-icons'
 import {PropTypes} from 'prop-types'
+import useKeyPress from "../hooks/useKeyPress";
 
 const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
 
     const [editState, setEditState] = useState(false)
     const [value, setValue] = useState('')
 
+    const enterPressed = useKeyPress(13)
+    const escPressed = useKeyPress(27)
+
     useEffect(() => {
-        const handleInputEvent = (event) => {
-            const {keyCode} = event
-            if (keyCode === 13 && editState){
-                const editItem = files.find(file => file.id === editState)
-                onSaveEdit(editItem.id, value)
-                setEditState(false)
-                setValue('')
-            }
-            else if (keyCode === 27 && editState){
-                setEditState(false)
-                setValue('')
-            }
+        if (enterPressed && editState){
+            const editItem = files.find(file => file.id === editState)
+            onSaveEdit(editItem.id, value)
+            setEditState(false)
+            setValue('')
         }
-        document.addEventListener('keyup', handleInputEvent)
-        return () => {
-            document.removeEventListener('keyup', handleInputEvent)
+        
+        if (escPressed && editState){
+            setEditState(false)
+            setValue('')
         }
     })
 
@@ -40,7 +38,7 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
                         { 
                             (file.id !== editState) &&
                             <>
-                                <FontAwesomeIcon className="col-1" icon={faMarkdown} /> 
+                                <FontAwesomeIcon className="col-1 icon-button" icon={faMarkdown} /> 
                                 <span className="col-7 c-link"
                                     onClick={() => {onFileClick(file.id)}}>
                                     {file.title}

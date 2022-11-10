@@ -12,3 +12,7 @@
 .c-link {
   cursor: pointer;
 }
+
+.file-list-div {
+  min-width: 234px;
+}

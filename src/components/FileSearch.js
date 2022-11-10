@@ -2,32 +2,28 @@ import React, {useState, useEffect, useRef} from "react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faSearch, faXmark} from '@fortawesome/free-solid-svg-icons'
 import PropTypes from "prop-types";
+import useKeyPress from "../hooks/useKeyPress";
 
 const FileSearch = ({title, onFileSearch}) => {
     const [inputActive, setInputActive] = useState(false)
     const [value, setValue] = useState('')
 
+    const entetPressed = useKeyPress(13)
+    const escPressed = useKeyPress(27)
+
     const node = useRef(null)
 
-    const closeSearch = (e) => {
-        e.preventDefault()
+    const closeSearch = () => {
         setInputActive(false)
         setValue('')
     }
 
     useEffect(() => {
-        const handleInputEvent = (event) => {
-            const {keyCode} = event
-            if (keyCode === 13 && inputActive){
-                onFileSearch(value)
-            }
-            else if (keyCode === 27 && inputActive){
-                closeSearch(event)
-            }
+        if (entetPressed && inputActive) {
+            onFileSearch(value)
         }
-        document.addEventListener('keyup', handleInputEvent)
-        return () => {
-            document.removeEventListener('keyup', handleInputEvent)
+        if (escPressed && inputActive) {
+            closeSearch()
         }
     })
 

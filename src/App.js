@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="App container-fluid">
       <div className='row'>
-        <div className='col-3'>
+        <div className='col-3 file-list-div'>
           <FileSearch title='我的云文档' onFileSearch={(value) => {console.log(value);}}/>
           <FileList files={defaultFiles} 
             onFileClick={(id) => {console.log('click' + id);}} 
