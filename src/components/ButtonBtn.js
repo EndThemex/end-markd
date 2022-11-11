@@ -9,7 +9,7 @@ const ButtomBtn = ({text, colorClass, icon, onBtnClick}) => (
             type="button"
             className={`btn btn-block no-border ${colorClass}`}
         >
-            <FontAwesomeIcon className=""
+            <FontAwesomeIcon className="me-1"
               title={text} icon={icon} /> 
             {text}
         </button>
@@ -19,7 +19,6 @@ const ButtomBtn = ({text, colorClass, icon, onBtnClick}) => (
 ButtomBtn.propTypes = {
     text: PropTypes.string,
     colorClass: PropTypes.string,
-    icon: PropTypes.element.isRequired,
     onBtnClick: PropTypes.func
 }
 

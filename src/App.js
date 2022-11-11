@@ -5,6 +5,7 @@ import defaultFiles from './utils/defaultFiles';
 import FileList from './components/FileList';
 import ButtomBtn from './components/ButtonBtn';
 import {faPlus, faFileImport} from '@fortawesome/free-solid-svg-icons'
+import TabList from './components/TabList';
 
 function App() {
   return (
@@ -31,8 +32,14 @@ function App() {
             </div>
           </div>
         </div>
-        <div className='col-9 bg-warring'>
-          <h1>2</h1>
+        <div className='col-9 bg-warring right-panel'>
+          <TabList 
+            files={defaultFiles}
+            activeId="2"
+            unsaveIds={["1"]}
+            onTabClick={(id) => console.log(id)}
+            onCloseTab={(id) => console.log(id)}
+          />
         </div>
       </div>
     </div>

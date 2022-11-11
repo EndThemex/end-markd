@@ -1,0 +1,14 @@
+.tablelist-component {
+    .close-icon {
+        visibility: hidden;
+    }
+    .nav-link:hover .close-icon {
+        visibility: visible;
+    }
+    .nav-link:hover .unsave-icon {
+        visibility: hidden;
+    }
+    .nav-link.active .close-icon {
+        visibility: visible;
+    }
+}

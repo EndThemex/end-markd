@@ -34,14 +34,14 @@ const FileSearch = ({title, onFileSearch}) => {
     })
 
     return (
-        <div className="alert alert-primary d-flex justify-content-between align-items-center">
+        <div className="alert alert-primary d-flex justify-content-between align-items-center p-2">
             {
                 !inputActive &&
                 <>
-                    <span>{title}</span>
+                    <span className="">{title}</span>
                     <button type="button" className="icon-button" 
                         onClick={() => {setInputActive(true)}}>
-                            <FontAwesomeIcon title="搜索" icon={faSearch} />
+                            <FontAwesomeIcon className="ms-1" title="搜索" icon={faSearch} />
                     </button>
                 </>
             }
@@ -49,14 +49,14 @@ const FileSearch = ({title, onFileSearch}) => {
                 inputActive &&
                 <>
                     <div className="">
-                        <input className="form-control" 
+                        <input className="form-control py-1" 
                             value={value} 
                             ref={node}
                             onChange={(e) => {setValue(e.target.value)}} />
                     </div>
                     <button type="button" className="icon-button" 
                         onClick={() => {setInputActive(false)}}>
-                            <FontAwesomeIcon title="关闭" icon={faXmark} />
+                            <FontAwesomeIcon className="ms-1" title="关闭" icon={faXmark} />
                         </button>
                 </>
             }
