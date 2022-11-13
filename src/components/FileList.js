@@ -32,14 +32,15 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
             {
                 files.map(file => (
                     <li
-                        className=" list-group-item bg-light row d-flex align-items-center"
+                        className="list-group-item bg-light row d-flex align-items-center"
                         key={file.id}
                     >
                         { 
                             (file.id !== editState) &&
                             <>
-                                <FontAwesomeIcon className="col-1 icon-button" icon={faMarkdown} /> 
-                                <span className="col-7 c-link"
+                                <FontAwesomeIcon className="col-1 icon-button px-0" icon={faMarkdown} /> 
+                                <span className="col c-link"
+                                    title={file.title}
                                     onClick={() => {onFileClick(file.id)}}>
                                     {file.title}
                                 </span>

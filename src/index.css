@@ -1,6 +1,9 @@
-
 .search-div {
-  min-height: 1.5rem;
+  height: 54px;
+}
+
+.search-input {
+  padding: 1px;
 }
 
 .icon-button {
@@ -11,8 +14,35 @@
 
 .c-link {
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .file-list-div {
   min-width: 234px;
+}
+
+.start-page {
+  font-size: 20px;
+  height: 300px;
+  line-height: 300px;
+  color: #ccc;
+  text-align: center;
+}
+
+.left-pannel {
+  min-height: 100vh;
+  position: relative;
+  background-color: rgb(238, 238, 238);
+}
+
+.button-group {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+
+.no-border {
+  border-radius: 0 !important;
 }

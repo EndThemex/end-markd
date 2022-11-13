@@ -1,6 +1,19 @@
 .tablelist-component {
+    .tab-content {
+        min-width: 80px;
+        max-width: 190px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
     .close-icon {
+        right: 8px;
+        min-width: 16px;
         visibility: hidden;
+        text-align: center;
+    }
+    .unsave-icon {
+        right: 8px;
     }
     .nav-link:hover .close-icon {
         visibility: visible;
@@ -9,6 +22,21 @@
         visibility: hidden;
     }
     .nav-link.active .close-icon {
+        display: inline-block;
         visibility: visible;
+    }
+    .with-unsave.nav-link .close-icon{
+        visibility: hidden;;
+    }
+    .with-unsave.nav-link.active .unsave-icon{
+        display: inline-block;
+        visibility: visible;;
+    }
+    .with-unsave.nav-link:hover .close-icon{
+        border: 1px;
+        visibility: visible;;
+    }
+    .with-unsave.nav-link:hover .unsave-icon{
+        visibility: hidden;;
     }
 }
