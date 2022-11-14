@@ -48,8 +48,7 @@ function App() {
       return file
     })
     setFiles(newFiles)
-    unsavedIds.push(fileId)
-    setUnsaveIds(...unsavedIds)
+    setUnsaveIds([...unsavedIds, fileId])
   }
 
   const tabClickHandler = (fileId) => {
