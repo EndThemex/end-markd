@@ -10,10 +10,12 @@ import { useState } from 'react';
 import SimpleMdeReact from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import editerOptions from './utils/editerOptions';
+import uuidv4 from  'uuid/v4'
 
 function App() {
 
   const [files, setFiles] = useState(defaultFiles)
+  const [searchFiles, setSearchFiles] = useState([])
   const [activeFileId, setActiveFileId] = useState('')
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unsavedIds, setUnsaveIds] = useState([])
@@ -22,6 +24,7 @@ function App() {
     return files.find(file => file.id === openId)
   })
 
+  const fileListArr = searchFiles.length === 0 ? files : searchFiles;
 
   const activeFile = files.find(file => file.id === activeFileId)
 
@@ -38,32 +41,72 @@ function App() {
     if (fileId === activeFileId) {
       setActiveFileId(newFileIds.pop())
     }
+
+    const newUnsaveIds = unsavedIds.filter(id => id !== fileId);
+    setUnsaveIds(newUnsaveIds);
   }
 
-  const onFileChange = (fileId, text) => {
-    let newFiles = files.map(file => {
-      if (file.id === fileId) {
-        file.body = text;
+  const updateFile = (newFile) => {
+    const newFiles = files.map(file => {
+      if (file.id === newFile.id) {
+        file = newFile;
       }
       return file
     })
     setFiles(newFiles)
-    setUnsaveIds([...unsavedIds, fileId])
+  }
+
+  const onFileChange = (fileId, text) => {
+    let newFile = files.filter(file => file.id === fileId)[0]
+    newFile.body = text;
+    updateFile(newFile);
+    if (!unsavedIds.includes(fileId)) {
+      setUnsaveIds([...unsavedIds, fileId])
+    }
   }
 
   const tabClickHandler = (fileId) => {
     setActiveFileId(fileId)
-  } 
+  }
+
+  const deleteFile = (id) => {
+    const newFiles = files.filter(file => file.id !== id);
+    setFiles(newFiles);
+    // 关闭打开的文件
+    closeFileHandler(id);
+  }
+
+  const updateFileTitle = (id, title) => {
+    let newFile = files.filter(file => file.id === id)[0]
+    newFile.title = title;
+    updateFile(newFile);
+  }
+
+  const fileSearch = (param) => {
+    const filterFiles = files.filter(file => file.title.includes(param));
+    setSearchFiles(filterFiles);
+  }
+
+  const createFile = () => {
+    const uuid = uuidv4()
+    const newFile = {
+      id: uuid,
+      title: '',
+      body: '',
+      createAt: new Date().getTime()
+    }
+    setFiles([...files, newFile]);
+  }
 
   return (
     <div className="App container-fluid">
       <div className='row no-gutters'>
         <div className='col-3 file-list-div left-pannel'>
-          <FileSearch title='我的云文档' onFileSearch={(value) => {console.log(value);}}/>
-          <FileList files={files} 
+          <FileSearch title='我的云文档' onFileSearch={(value) => fileSearch(value)}/>
+          <FileList files={fileListArr} 
             onFileClick={(id) => openFileHandler(id)} 
-            onSaveEdit={(id, newTitle) => {console.log('edit:' + newTitle);}} 
-            onFileDelete={(id) => {console.log('del' + id);}}/>
+            onSaveEdit={(id, newTitle) => updateFileTitle(id, newTitle)} 
+            onFileDelete={(id) => deleteFile(id)}/>
           <div className='row button-group'>
             <div className='row col'>
               <ButtomBtn colorClass="no-border btn-primary" 

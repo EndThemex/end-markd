@@ -16,6 +16,7 @@ const FileSearch = ({title, onFileSearch}) => {
     const closeSearch = () => {
         setInputActive(false)
         setValue('')
+        onFileSearch('')
     }
 
     useEffect(() => {
@@ -25,7 +26,7 @@ const FileSearch = ({title, onFileSearch}) => {
         if (escPressed && inputActive) {
             closeSearch()
         }
-    })
+    }, [entetPressed, escPressed, inputActive])
 
     useEffect(() => {
         if (inputActive){
@@ -42,7 +43,7 @@ const FileSearch = ({title, onFileSearch}) => {
                 <>
                     <span className="col ms-1">{title}</span>
                     <button type="button" className="col-2 icon-button" 
-                        onClick={() => {setInputActive(true)}}>
+                        onClick={() => {setInputActive(true);}}>
                             <FontAwesomeIcon className="ms-1" title="搜索" icon={faSearch} />
                     </button>
                 </>
@@ -57,7 +58,7 @@ const FileSearch = ({title, onFileSearch}) => {
                             onChange={(e) => {setValue(e.target.value)}} />
                     </div>
                     <button type="button" className="col-2 icon-button" 
-                        onClick={() => {setInputActive(false)}}>
+                        onClick={() => {setInputActive(false); closeSearch()}}>
                             <FontAwesomeIcon className="ms-1" title="关闭" icon={faXmark} />
                         </button>
                 </>
