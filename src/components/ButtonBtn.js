@@ -8,6 +8,7 @@ const ButtomBtn = ({text, colorClass, icon, onBtnClick}) => (
         <button
             type="button"
             className={`btn btn-block no-border ${colorClass}`}
+            onClick={() => {onBtnClick()}}
         >
             <FontAwesomeIcon className="me-1"
               title={text} icon={icon} /> 

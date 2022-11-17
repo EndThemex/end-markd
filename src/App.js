@@ -10,7 +10,7 @@ import { useState } from 'react';
 import SimpleMdeReact from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import editerOptions from './utils/editerOptions';
-import uuidv4 from  'uuid/v4'
+import {v4 as uuidv4} from  'uuid'
 
 function App() {
 
@@ -79,6 +79,7 @@ function App() {
   const updateFileTitle = (id, title) => {
     let newFile = files.filter(file => file.id === id)[0]
     newFile.title = title;
+    newFile.isNew = false;
     updateFile(newFile);
   }
 
@@ -93,9 +94,11 @@ function App() {
       id: uuid,
       title: '',
       body: '',
-      createAt: new Date().getTime()
+      createAt: new Date().getTime(),
+      isNew: true
     }
     setFiles([...files, newFile]);
+    console.log(newFile);
   }
 
   return (
@@ -112,7 +115,7 @@ function App() {
               <ButtomBtn colorClass="no-border btn-primary" 
                 text="新建"
                 icon={faPlus}
-                onBtnClick={() => {console.log(1)}} />
+                onBtnClick={() => createFile()} />
             </div>
             <div className='row col'>
               <ButtomBtn colorClass="no-border btn-success" 

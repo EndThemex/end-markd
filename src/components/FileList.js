@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faMarkdown} from '@fortawesome/free-brands-svg-icons'
 import {faEdit, faTrash, faXmark} from '@fortawesome/free-solid-svg-icons'
@@ -9,12 +9,20 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
 
     const [editState, setEditState] = useState(false)
     const [value, setValue] = useState('')
-
+    const inputRef = useRef(null);
     const enterPressed = useKeyPress(13)
     const escPressed = useKeyPress(27)
 
+    const closeInput = (editItem) => {
+        setEditState(false)
+        setValue('')
+        if (editItem.isNew) {
+            onFileDelete(editItem.id)
+        }
+    }
+
     useEffect(() => {
-        if (enterPressed && editState){
+        if (enterPressed && editState && value){
             const editItem = files.find(file => file.id === editState)
             onSaveEdit(editItem.id, value)
             setEditState(false)
@@ -22,10 +30,22 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
         }
         
         if (escPressed && editState){
-            setEditState(false)
-            setValue('')
+            const editItem = files.find(file => file.id === editState)
+            closeInput(editItem)
+        }
+
+        if (editState) {
+            inputRef.current.focus()
         }
     })
+
+    useEffect(() => {
+        const newFile = files.find(file => file.isNew);
+        if (newFile) {
+            setEditState(newFile.id);
+            setValue('');
+        }
+    }, [files])
 
     return (
         <ul className="list-group list-group-flush file-list">
@@ -36,7 +56,7 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
                         key={file.id}
                     >
                         { 
-                            (file.id !== editState) &&
+                            ((file.id !== editState) && !file.isNew) &&
                             <>
                                 <FontAwesomeIcon className="col-1 icon-button px-0" icon={faMarkdown} /> 
                                 <span className="col c-link"
@@ -55,13 +75,15 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
                             </>
                         }
                         {
-                            (file.id === editState) &&
+                            ((file.id === editState) || file.isNew) &&
                             <>
                                 <input className="col-10" 
                                     value={value}
+                                    ref={inputRef}
+                                    placeholder="请输入文件名称"
                                     onChange={(e) => {setValue(e.target.value)}} />
                                 <button className="col-1 icon-button"
-                                    onClick={() => {setEditState(false)}}>
+                                    onClick={() => closeInput(file)}>
                                     <FontAwesomeIcon title="Delete" icon={faXmark} /> 
                                 </button>
                             </>
