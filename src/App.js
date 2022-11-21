@@ -11,22 +11,25 @@ import SimpleMdeReact from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import editerOptions from './utils/editerOptions';
 import {v4 as uuidv4} from  'uuid'
+import { flattenArr, objToArr} from './utils/helper'
 
 function App() {
 
-  const [files, setFiles] = useState(defaultFiles)
+  const [files, setFiles] = useState(flattenArr(defaultFiles))
   const [searchFiles, setSearchFiles] = useState([])
   const [activeFileId, setActiveFileId] = useState('')
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unsavedIds, setUnsaveIds] = useState([])
 
+  const filesArr = objToArr(files);
+
   const openedFiles = openedFileIds.map(openId => {
-    return files.find(file => file.id === openId)
+    return files[openId]
   })
 
-  const fileListArr = searchFiles.length === 0 ? files : searchFiles;
+  const fileListArr = searchFiles.length === 0 ? filesArr : searchFiles;
 
-  const activeFile = files.find(file => file.id === activeFileId)
+  const activeFile = files[activeFileId]
 
   const openFileHandler = (openId) => {
     setActiveFileId(openId)
@@ -47,18 +50,11 @@ function App() {
   }
 
   const updateFile = (newFile) => {
-    const newFiles = files.map(file => {
-      if (file.id === newFile.id) {
-        file = newFile;
-      }
-      return file
-    })
-    setFiles(newFiles)
+    setFiles({...files, [newFile.id]: newFile})
   }
 
   const onFileChange = (fileId, text) => {
-    let newFile = files.filter(file => file.id === fileId)[0]
-    newFile.body = text;
+    let newFile = { ...files[fileId], body: text}
     updateFile(newFile);
     if (!unsavedIds.includes(fileId)) {
       setUnsaveIds([...unsavedIds, fileId])
@@ -70,21 +66,19 @@ function App() {
   }
 
   const deleteFile = (id) => {
-    const newFiles = files.filter(file => file.id !== id);
-    setFiles(newFiles);
+    delete files[id];
+    setFiles(files);
     // 关闭打开的文件
     closeFileHandler(id);
   }
 
   const updateFileTitle = (id, title) => {
-    let newFile = files.filter(file => file.id === id)[0]
-    newFile.title = title;
-    newFile.isNew = false;
+    let newFile = {...files[id], title: title, isNew: false}
     updateFile(newFile);
   }
 
   const fileSearch = (param) => {
-    const filterFiles = files.filter(file => file.title.includes(param));
+    const filterFiles = filesArr.filter(file => file.title.includes(param));
     setSearchFiles(filterFiles);
   }
 
@@ -97,8 +91,7 @@ function App() {
       createAt: new Date().getTime(),
       isNew: true
     }
-    setFiles([...files, newFile]);
-    console.log(newFile);
+    setFiles({...files, [uuid]: newFile});
   }
 
   return (
@@ -121,7 +114,7 @@ function App() {
               <ButtomBtn colorClass="no-border btn-success" 
                 text="导入"
                 icon={faFileImport}
-                onBtnClick={() => {console.log(1)}} />
+                onBtnClick={() => {console.log("导入")}} />
             </div>
           </div>
         </div>
