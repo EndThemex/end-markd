@@ -12,6 +12,19 @@ import "easymde/dist/easymde.min.css";
 import editerOptions from './utils/editerOptions';
 import {v4 as uuidv4} from  'uuid'
 import { flattenArr, objToArr} from './utils/helper'
+import fileHelper from './utils/fileHelper';
+import getPath from './utils/remote'
+
+const path = window.require('path');
+//const {webContents} = window.require('electron')
+//const app = window.require('@electron/remote').app
+
+// const main = window.require('@electron/remote/main')
+
+// main.enable(webContents);
+const Store = window.require('electron-store')
+
+const fileStore = new Store({'name': 'File Data'})
 
 function App() {
 
@@ -20,6 +33,13 @@ function App() {
   const [activeFileId, setActiveFileId] = useState('')
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unsavedIds, setUnsaveIds] = useState([])
+
+  let fileSavePath
+  getPath('documents').then((path) => {
+    console.log(path);
+    fileSavePath = path + '/end-files';
+  })
+  
 
   const filesArr = objToArr(files);
 
@@ -66,14 +86,40 @@ function App() {
   }
 
   const deleteFile = (id) => {
-    delete files[id];
-    setFiles(files);
-    // 关闭打开的文件
-    closeFileHandler(id);
+    let filePath = path.join(fileSavePath, files[id].title + '.md');
+    fileHelper.deleteFile(filePath)
+      .then(() => {
+        delete files[id];
+        setFiles({...files});
+        // 关闭打开的文件
+        closeFileHandler(id);
+      })
   }
 
-  const updateFileTitle = (id, title) => {
-    let newFile = {...files[id], title: title, isNew: false}
+  const saveFileContent = () => {
+    let filePath = path.join(fileSavePath, activeFile.title + '.md');
+    fileHelper.writeFile(filePath, activeFile.body)
+      .then(() => {
+        setUnsaveIds(unsavedIds.filter(id => id !== activeFile.id))
+      })
+  }
+
+  const updateFileTitle = (id, title, isNew) => {
+    let newFile = {...files[id], title: title, body: 'Q.Q', isNew: false}
+    let filePath = path.join(fileSavePath, newFile.title + '.md');
+    if (isNew && fileSavePath) {
+      console.log(filePath);
+      fileHelper.writeFile(filePath, newFile.body)
+        .then(() => {
+          updateFile(newFile);
+        });
+    }
+    else {
+      fileHelper.renameFile(path.join(fileSavePath, files[id].title + '.md'), filePath)
+      .then(() => {
+        updateFile(newFile);
+      });
+    }
     updateFile(newFile);
   }
 
@@ -94,6 +140,10 @@ function App() {
     setFiles({...files, [uuid]: newFile});
   }
 
+  const saveFilesToStor = (files) => {
+    
+  }
+
   return (
     <div className="App container-fluid">
       <div className='row no-gutters'>
@@ -101,7 +151,7 @@ function App() {
           <FileSearch title='我的云文档' onFileSearch={(value) => fileSearch(value)}/>
           <FileList files={fileListArr} 
             onFileClick={(id) => openFileHandler(id)} 
-            onSaveEdit={(id, newTitle) => updateFileTitle(id, newTitle)} 
+            onSaveEdit={(id, newTitle, isNew) => updateFileTitle(id, newTitle, isNew)} 
             onFileDelete={(id) => deleteFile(id)}/>
           <div className='row button-group'>
             <div className='row col'>
@@ -115,6 +165,12 @@ function App() {
                 text="导入"
                 icon={faFileImport}
                 onBtnClick={() => {console.log("导入")}} />
+            </div>
+            <div className='row col'>
+              <ButtomBtn colorClass="no-border btn-success" 
+                text="保存"
+                icon={faFileImport}
+                onBtnClick={() => saveFileContent()} />
             </div>
           </div>
         </div>
