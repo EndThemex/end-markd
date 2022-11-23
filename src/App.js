@@ -1,7 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import FileSearch from './components/FileSearch';
-import defaultFiles from './utils/defaultFiles';
 import FileList from './components/FileList';
 import ButtomBtn from './components/ButtonBtn';
 import {faPlus, faFileImport} from '@fortawesome/free-solid-svg-icons'
@@ -28,7 +27,7 @@ const fileStore = new Store({'name': 'File Data'})
 
 function App() {
 
-  const [files, setFiles] = useState(flattenArr(defaultFiles))
+  const [files, setFiles] = useState(fileStore.get('files') || {})
   const [searchFiles, setSearchFiles] = useState([])
   const [activeFileId, setActiveFileId] = useState('')
   const [openedFileIds, setOpenedFileIds] = useState([])
@@ -70,7 +69,9 @@ function App() {
   }
 
   const updateFile = (newFile) => {
-    setFiles({...files, [newFile.id]: newFile})
+    const newFiles = {...files, [newFile.id]: newFile}
+    saveFilesToStor(newFiles)
+    setFiles(newFiles)
   }
 
   const onFileChange = (fileId, text) => {
@@ -88,12 +89,11 @@ function App() {
   const deleteFile = (id) => {
     let filePath = path.join(fileSavePath, files[id].title + '.md');
     fileHelper.deleteFile(filePath)
-      .then(() => {
-        delete files[id];
-        setFiles({...files});
-        // 关闭打开的文件
-        closeFileHandler(id);
-      })
+    // 关闭打开的文件
+    closeFileHandler(id);
+    delete files[id];
+    setFiles(files);
+    saveFilesToStor(files)
   }
 
   const saveFileContent = () => {
@@ -105,10 +105,9 @@ function App() {
   }
 
   const updateFileTitle = (id, title, isNew) => {
-    let newFile = {...files[id], title: title, body: 'Q.Q', isNew: false}
-    let filePath = path.join(fileSavePath, newFile.title + '.md');
+    let filePath = path.join(fileSavePath, title + '.md');
+    let newFile = {...files[id], title: title, body: 'Q.Q', isNew: false, path: filePath}
     if (isNew && fileSavePath) {
-      console.log(filePath);
       fileHelper.writeFile(filePath, newFile.body)
         .then(() => {
           updateFile(newFile);
@@ -141,7 +140,18 @@ function App() {
   }
 
   const saveFilesToStor = (files) => {
-    
+    const filesStoreObj = objToArr(files).reduce((result, file) => {
+      const {id, path, title, createAt} = file
+      result[id] = {
+        id,
+        path,
+        title,
+        createAt
+      }
+
+      return result;
+    }, {})
+    fileStore.set('files', filesStoreObj)
   }
 
   return (
